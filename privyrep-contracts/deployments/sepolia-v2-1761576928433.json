@@ -1,0 +1,11 @@
+{
+  "network": "sepolia",
+  "deployer": "0x189455724a69815d75c5A972b0C31F48D0d84fcE",
+  "timestamp": "2025-10-27T14:55:28.433Z",
+  "contracts": {
+    "ReputationScore": "0x16d91ec4F00cc05B2f8d3358e90ab0f4AC0db430",
+    "IdentityProofManager": "0x1492770cbc14c29d308828ef95424E1975374cD2",
+    "CredentialNFT": "0xf316433a05a29A515B28923045cA5658F169b23f",
+    "VerificationServiceV2": "0x481e3D64C08794737159cE36Deb73E1E01a3b1cE"
+  }
+}

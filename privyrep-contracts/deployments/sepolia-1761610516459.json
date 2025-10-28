@@ -1,0 +1,10 @@
+{
+  "network": "sepolia",
+  "deployer": "0x189455724a69815d75c5A972b0C31F48D0d84fcE",
+  "timestamp": "2025-10-28T00:15:16.459Z",
+  "contracts": {
+    "ReputationScore": "0x21b37E6Fa00C91E5cB04b18cA9544bEDaC234aC7",
+    "IdentityProofManager": "0x75DAd365F12563369aE08688c1b6f105255767b0",
+    "VerificationService": "0xe43D69d358a79E92c9dE402303aE957102090a75"
+  }
+}

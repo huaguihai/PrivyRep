@@ -1,0 +1,33 @@
+{
+  "name": "privyrep-contracts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.18.0",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.1.0",
+    "@nomicfoundation/hardhat-ethers": "3.0.9",
+    "@nomicfoundation/hardhat-network-helpers": "1.0.12",
+    "@nomicfoundation/hardhat-verify": "2.0.14",
+    "@types/chai": "4.3.20",
+    "@types/mocha": "10.0.10",
+    "chai": "4.5.0",
+    "dotenv": "^17.2.3",
+    "ethers": "^6.14.3",
+    "hardhat": "2.25.0",
+    "mocha": "11.5.0",
+    "ts-node": "10.9.2"
+  },
+  "dependencies": {
+    "@fhevm/solidity": "^0.8.0",
+    "@openzeppelin/contracts": "5.3.0",
+    "@zama-fhe/oracle-solidity": "^0.2.0",
+    "encrypted-types": "^0.0.4"
+  }
+}
