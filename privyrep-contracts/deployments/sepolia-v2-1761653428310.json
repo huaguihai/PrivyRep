@@ -1,0 +1,12 @@
+{
+  "network": "sepolia",
+  "deployer": "0x189455724a69815d75c5A972b0C31F48D0d84fcE",
+  "timestamp": "2025-10-28T12:10:28.310Z",
+  "v2Deployment": true,
+  "contracts": {
+    "ReputationScore": "0x16d91ec4F00cc05B2f8d3358e90ab0f4AC0db430",
+    "IdentityProofManager": "0x1492770cbc14c29d308828ef95424E1975374cD2",
+    "VerificationServiceV2": "0x92846236576E783D6404232934AFc1C5914eEFb7"
+  },
+  "notes": "V2 adds Oracle auto-callback. V1 kept as backup for rollback."
+}
