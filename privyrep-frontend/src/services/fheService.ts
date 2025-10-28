@@ -39,11 +39,11 @@ export async function initializeFheInstance(): Promise<FhevmInstance> {
 
     console.log('✅ [FHE] Environment checks passed');
 
-    // 3️⃣ Load SDK from CDN (0.2.0) - THIS IS THE KEY FIX!
-    console.log('📦 [FHE] Loading SDK from Zama CDN...');
-    const sdk: any = await import('https://cdn.zama.ai/relayer-sdk-js/0.2.0/relayer-sdk-js.js');
+    // 3️⃣ Load SDK from CDN (0.1.0) - Match contract Oracle version!
+    console.log('📦 [FHE] Loading SDK from Zama CDN (v0.1.0)...');
+    const sdk: any = await import('https://cdn.zama.ai/relayer-sdk-js/0.1.0/relayer-sdk-js.js');
     const { initSDK, createInstance, SepoliaConfig } = sdk;
-    console.log('✅ [FHE] SDK loaded from CDN');
+    console.log('✅ [FHE] SDK v0.1.0 loaded from CDN');
 
     // 4️⃣ Initialize WASM modules
     console.log('📦 [FHE] Loading WASM modules...');
