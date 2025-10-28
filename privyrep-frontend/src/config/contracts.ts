@@ -1,6 +1,6 @@
 import ReputationScoreABI from '../contracts/ReputationScore.json';
 import IdentityProofManagerABI from '../contracts/IdentityProofManager.json';
-import VerificationServiceABI from '../contracts/VerificationService.json';
+import VerificationServiceV2ABI from '../contracts/VerificationServiceV2.json'; // V2 with Oracle callback
 
 export const REPUTATION_SCORE_ADDRESS = import.meta.env.VITE_REPUTATION_SCORE_ADDRESS as `0x${string}`;
 export const IDENTITY_PROOF_MANAGER_ADDRESS = import.meta.env.VITE_IDENTITY_PROOF_MANAGER_ADDRESS as `0x${string}`;
@@ -17,6 +17,6 @@ export const contracts = {
   },
   verificationService: {
     address: VERIFICATION_SERVICE_ADDRESS,
-    abi: VerificationServiceABI.abi,
+    abi: VerificationServiceV2ABI.abi, // ✅ Using V2 ABI (supports Oracle callback)
   },
 } as const;
