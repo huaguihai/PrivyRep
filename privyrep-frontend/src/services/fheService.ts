@@ -1,135 +1,80 @@
-// Polyfill for global (needed in browser environment)
-if (typeof window !== 'undefined' && typeof (window as any).global === 'undefined') {
-  (window as any).global = globalThis;
-}
+/**
+ * FHE Service - 完全照抄 Zamabelief 的成功实现
+ * NOTE: We dynamically import the SDK from the CDN to bypass local bundling issues
+ * and ensure we are using the exact 0.2.0 browser bundle.
+ */
 
 import { utils } from 'ethers';
 
-// NOTE: We dynamically import the SDK from the CDN to bypass local bundling issues
-// and ensure we are using the exact 0.2.0 browser bundle (following Zamabelief's pattern)
-
-// Type definitions
+// Type definition for FHEVM instance
 export interface FhevmInstance {
-  getPublicKey: () => any;
   createEncryptedInput: (contractAddress: string, userAddress: string) => any;
-  publicDecrypt?: (handles: string[]) => Promise<Record<string, number>>;
+  getPublicKey: () => any;
+  publicDecrypt: (handles: string[]) => Promise<any>;
 }
 
-// Singleton instance management
+// Singleton instance
 let fheInstance: FhevmInstance | null = null;
-let isInitializing = false;
 
 /**
- * Initialize FHE instance using Zamabelief's proven CDN pattern
- * Uses CDN-hosted SDK to avoid WASM bundling issues
+ * Initialize FHE instance - 完全照抄 Zamabelief
  */
 export async function initializeFheInstance(): Promise<FhevmInstance> {
   console.log('🔧 [FHE] Initializing FHE instance...');
 
+  // Check if ethereum is available (prevents mobile crashes)
+  if (typeof window === 'undefined' || !window.ethereum) {
+    throw new Error('Ethereum provider not found. Please install MetaMask or connect a wallet.');
+  }
+
+  // Load SDK from CDN (0.2.0)
+  const sdk: any = await import('https://cdn.zama.ai/relayer-sdk-js/0.2.0/relayer-sdk-js.js');
+
+  const { initSDK, createInstance, SepoliaConfig } = sdk as any;
+
+  await initSDK(); // Loads WASM
+
+  // ⭐ 关键：完全照抄 Zamabelief 的配置，简单就是最好
+  const config = { ...SepoliaConfig, network: window.ethereum };
+
   try {
-    // 1️⃣ Check browser environment
-    if (typeof window === 'undefined') {
-      throw new Error("❌ FHE can only be initialized in browser environment");
-    }
-
-    // 2️⃣ Check ethereum provider availability
-    if (!window.ethereum) {
-      throw new Error("❌ Ethereum provider not found. Please install MetaMask or another Web3 wallet.");
-    }
-
-    console.log('✅ [FHE] Environment checks passed');
-
-    // 3️⃣ Load SDK from CDN (0.1.0) - Match contract Oracle version!
-    console.log('📦 [FHE] Loading SDK from Zama CDN (v0.1.0)...');
-    const sdk: any = await import('https://cdn.zama.ai/relayer-sdk-js/0.1.0/relayer-sdk-js.js');
-    const { initSDK, createInstance, SepoliaConfig } = sdk;
-    console.log('✅ [FHE] SDK v0.1.0 loaded from CDN');
-
-    // 4️⃣ Initialize WASM modules
-    console.log('📦 [FHE] Loading WASM modules...');
-    await initSDK();
-    console.log('✅ [FHE] WASM modules loaded');
-
-    // 5️⃣ Create instance with SepoliaConfig
-    console.log('⚙️ [FHE] Creating FHEVM instance with SepoliaConfig...');
-    const config = { ...SepoliaConfig, network: window.ethereum };
-    console.log('🔑 [FHE] Configuration:', {
-      hasSepoliaConfig: !!SepoliaConfig,
-      hasNetwork: !!window.ethereum,
-    });
-
-    const instance = await createInstance(config);
+    fheInstance = await createInstance(config);
     console.log('✅ [FHE] FHEVM instance created successfully!');
-    console.log('📊 [FHE] Instance details:', {
-      hasPublicKey: typeof instance.getPublicKey === 'function',
-      hasCreateEncryptedInput: typeof instance.createEncryptedInput === 'function',
-    });
-
-    return instance;
-
-  } catch (error: any) {
-    console.error('❌ [FHE] FHEVM instance creation failed');
-    console.error('📛 [FHE] Error type:', error?.constructor?.name || 'Unknown');
-    console.error('📛 [FHE] Error message:', error?.message || 'No message');
-    console.error('📛 [FHE] Error stack:', error?.stack);
-
-    // Enhanced error messages
-    if (error?.message?.includes('Failed to fetch') || error?.message?.includes('NetworkError')) {
-      throw new Error('🌐 Gateway connection failed. Please check your network connection and try again.');
-    }
-    if (error?.message?.includes('WASM')) {
-      throw new Error('📦 WASM module loading failed. Please refresh the page and try again.');
-    }
-    if (error?.message?.includes('ethereum')) {
-      throw new Error('🦊 Web3 wallet not detected. Please install MetaMask or connect your wallet.');
-    }
-
-    throw error;
+    return fheInstance;
+  } catch (err) {
+    console.error('❌ [FHE] FHEVM instance creation failed:', err);
+    throw err;
   }
 }
 
 /**
- * Gets or creates the FHEVM instance - Singleton pattern
+ * Get FHE instance (singleton pattern)
+ */
+export function getFheInstance(): FhevmInstance | null {
+  return fheInstance;
+}
+
+/**
+ * Get or create FHE instance
  */
 export async function getFhevmInstance(): Promise<FhevmInstance> {
-  console.log('🔍 [FHE] getFhevmInstance called');
-
-  // Return cached instance if available
   if (fheInstance) {
     console.log('♻️ [FHE] Returning cached instance');
     return fheInstance;
   }
 
-  // Prevent concurrent initialization attempts
-  if (isInitializing) {
-    console.log('🔒 [FHE] Initialization in progress, waiting...');
-    await new Promise(resolve => setTimeout(resolve, 100));
-    return getFhevmInstance();
-  }
-
-  // Create new instance
-  isInitializing = true;
-  try {
-    fheInstance = await initializeFheInstance();
-    console.log('🎉 [FHE] Instance cached successfully');
-    return fheInstance;
-  } catch (error) {
-    console.error('💥 [FHE] Instance creation failed, resetting state');
-    fheInstance = null;
-    throw error;
-  } finally {
-    isInitializing = false;
-  }
+  console.log('🆕 [FHE] Creating new instance');
+  return await initializeFheInstance();
 }
 
 /**
  * Identity data structure for PrivyRep
  */
 export interface IdentityData {
-  assetBalance: number;  // User's asset balance
-  nftCount: number;      // Number of NFTs owned
-  accountAge: number;    // Account age in days
-  txCount: number;       // Transaction count
+  assetBalance: number;
+  nftCount: number;
+  accountAge: number;
+  txCount: number;
 }
 
 /**
@@ -144,97 +89,68 @@ export interface EncryptedIdentity {
 }
 
 /**
- * Encrypts user identity data using FHE
- * Encrypts all 4 fields required by IdentityProofManager.sol
+ * Encrypts user identity data using FHE - 参考 Zamabelief 的实现模式
  */
 export async function encryptIdentityData(
   identityData: IdentityData,
   contractAddress: string,
   userAddress: string
 ): Promise<EncryptedIdentity> {
-  console.log('🔐 [FHE] Starting identity encryption process...');
-  console.log(`📊 [FHE] Identity data:`, identityData);
-  console.log(`📊 [FHE] Contract: ${contractAddress.slice(0, 6)}...${contractAddress.slice(-4)}`);
-  console.log(`📊 [FHE] User: ${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`);
+  console.log('🔐 [FHE] Starting identity encryption...');
+  console.log(`📊 [FHE] Data:`, identityData);
 
   try {
-    // 1️⃣ Get FHE instance
-    console.log('🔧 [FHE] Getting FHE instance...');
-    const instance = await getFhevmInstance();
-    console.log('✅ [FHE] FHE instance acquired');
+    // 1️⃣ Get or create FHE instance
+    let fhe = getFheInstance();
+    if (!fhe) {
+      console.log('🔧 [FHE] Initializing FHE instance...');
+      fhe = await initializeFheInstance();
+    }
+    if (!fhe) throw new Error('Failed to initialize FHE instance');
 
     // 2️⃣ Create encrypted input for the specific contract and user
     console.log('📝 [FHE] Creating encrypted input...');
-    const input = instance.createEncryptedInput(contractAddress, userAddress);
-    console.log('✅ [FHE] Encrypted input created');
+    const ciphertext = await fhe.createEncryptedInput(contractAddress, userAddress);
 
     // 3️⃣ Add all 4 identity values as uint32
-    console.log(`🔢 [FHE] Adding assetBalance: ${identityData.assetBalance}`);
-    input.add32(identityData.assetBalance);
+    console.log('🔢 [FHE] Adding identity values...');
+    ciphertext.add32(identityData.assetBalance);
+    ciphertext.add32(identityData.nftCount);
+    ciphertext.add32(identityData.accountAge);
+    ciphertext.add32(identityData.txCount);
 
-    console.log(`🔢 [FHE] Adding nftCount: ${identityData.nftCount}`);
-    input.add32(identityData.nftCount);
+    // 4️⃣ Encrypt and generate proof
+    console.log('🔒 [FHE] Encrypting...');
+    const encrypted = await ciphertext.encrypt();
+    const { handles, inputProof } = encrypted;
 
-    console.log(`🔢 [FHE] Adding accountAge: ${identityData.accountAge}`);
-    input.add32(identityData.accountAge);
+    // 5️⃣ Convert to hex strings using ethers v5 utils.hexlify
+    const encryptedHexes = handles.map((h: any) => utils.hexlify(h) as `0x${string}`);
+    const proofHex = utils.hexlify(inputProof) as `0x${string}`;
 
-    console.log(`🔢 [FHE] Adding txCount: ${identityData.txCount}`);
-    input.add32(identityData.txCount);
-
-    console.log('✅ [FHE] All identity values added to input');
-
-    // 4️⃣ Generate the encrypted input with proof
-    console.log('🔒 [FHE] Encrypting and generating proof...');
-    const encryptedInput = await input.encrypt();
     console.log('✅ [FHE] Encryption complete!');
 
-    // ⭐ 关键修复：使用 ethers.utils.hexlify 而不是自定义函数（参考 Zamabelief）
-    const handles = encryptedInput.handles.map((h: any) => utils.hexlify(h) as `0x${string}`);
-    const inputProof = utils.hexlify(encryptedInput.inputProof) as `0x${string}`;
-
-    console.log('📦 [FHE] Encrypted data:', {
-      handleCount: handles.length,
-      hasInputProof: !!inputProof,
-      handle0Preview: `${handles[0].slice(0, 10)}...`,
-      proofPreview: `${inputProof.slice(0, 10)}...`,
-    });
-
     // Verify we have exactly 4 handles
-    if (handles.length !== 4) {
-      throw new Error(`Expected 4 encrypted handles, got ${handles.length}`);
+    if (encryptedHexes.length !== 4) {
+      throw new Error(`Expected 4 encrypted handles, got ${encryptedHexes.length}`);
     }
 
-    const result: EncryptedIdentity = {
-      encryptedAsset: handles[0],
-      encryptedNFT: handles[1],
-      encryptedAge: handles[2],
-      encryptedTx: handles[3],
-      inputProof: inputProof,
+    return {
+      encryptedAsset: encryptedHexes[0],
+      encryptedNFT: encryptedHexes[1],
+      encryptedAge: encryptedHexes[2],
+      encryptedTx: encryptedHexes[3],
+      inputProof: proofHex,
     };
 
-    console.log('🎉 [FHE] Identity encryption successful!');
-    return result;
-
   } catch (error: any) {
-    console.error('❌ [FHE] Identity encryption failed');
-    console.error('📛 [FHE] Error type:', error?.constructor?.name || 'Unknown');
-    console.error('📛 [FHE] Error message:', error?.message || 'No message');
-    console.error('📛 [FHE] Full error:', error);
-
-    // Enhanced error messages
-    if (error?.message?.includes('createEncryptedInput')) {
-      throw new Error('🔧 Failed to create encrypted input. Please check contract and user addresses.');
-    }
-    if (error?.message?.includes('encrypt')) {
-      throw new Error('🔒 Encryption failed. Please try again.');
-    }
-
-    throw new Error(`💥 Encryption error: ${error?.message || 'Unknown error'}`);
+    console.error('❌ [FHE] Encryption failed:', error);
+    throw new Error(`Encryption error: ${error?.message || 'Unknown error'}`);
   }
 }
 
 /**
- * Helper to get the FHE public key
+ * Get FHE public key
  */
 export async function getFhePublicKey(): Promise<string> {
   console.log('🔑 [FHE] Fetching public key...');
@@ -242,30 +158,52 @@ export async function getFhePublicKey(): Promise<string> {
     const instance = await getFhevmInstance();
     const publicKeyData = instance.getPublicKey();
 
-    // Handle both string and object return types
     let publicKeyHex: string;
     if (typeof publicKeyData === 'string') {
       publicKeyHex = publicKeyData;
     } else if (publicKeyData && 'publicKey' in publicKeyData) {
-      publicKeyHex = utils.hexlify(publicKeyData.publicKey);
+      publicKeyHex = publicKeyData.publicKey;
     } else {
-      throw new Error('Unexpected public key format');
+      publicKeyHex = JSON.stringify(publicKeyData);
     }
 
-    console.log('✅ [FHE] Public key retrieved:', `${publicKeyHex.slice(0, 20)}...`);
+    console.log('✅ [FHE] Public key retrieved, length:', publicKeyHex.length);
     return publicKeyHex;
+
   } catch (error: any) {
     console.error('❌ [FHE] Failed to get public key:', error);
-    throw error;
+    throw new Error(`Failed to get FHE public key: ${error?.message || 'Unknown error'}`);
   }
 }
 
 /**
- * Reset FHE instance (useful for debugging or chain switches)
+ * Reset FHE instance (for debugging or chain switches)
  */
-export function resetFheInstance(): void {
-  console.log('🔄 [FHE] Resetting FHE instance...');
+export function resetFheInstance() {
+  console.log('🔄 [FHE] Resetting instance');
   fheInstance = null;
-  isInitializing = false;
-  console.log('✅ [FHE] Instance reset complete');
+}
+
+/**
+ * Decrypt encrypted value - 参考 Zamabelief
+ */
+export async function decryptValue(encryptedBytes: string): Promise<number> {
+  const fhe = getFheInstance();
+  if (!fhe) throw new Error('FHE instance not initialized. Call initializeFheInstance() first.');
+
+  try {
+    let handle = encryptedBytes;
+    if (typeof handle === "string" && handle.startsWith("0x") && handle.length === 66) {
+      const values = await fhe.publicDecrypt([handle]);
+      // values is an object: { [handle]: value }
+      return Number(values[handle]);
+    } else {
+      throw new Error('Invalid ciphertext handle for decryption');
+    }
+  } catch (error: any) {
+    if (error?.message?.includes('Failed to fetch') || error?.message?.includes('NetworkError')) {
+      throw new Error('Decryption service is temporarily unavailable. Please try again later.');
+    }
+    throw error;
+  }
 }

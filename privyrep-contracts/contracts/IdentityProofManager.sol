@@ -146,11 +146,16 @@ contract IdentityProofManager is SepoliaConfig {
         externalEuint32 encryptedBalance,
         bytes calldata inputProof
     ) external onlyRegistered(msg.sender) {
+        // ⭐ Step 1: 转换
         euint32 newBalance = FHE.fromExternal(encryptedBalance, inputProof);
-        FHE.allow(newBalance, msg.sender);
-        FHE.allowThis(newBalance);
 
+        // ⭐ Step 2: 存储（必须先存储！）
         identities[msg.sender].assetBalance = newBalance;
+
+        // ⭐ Step 3: 授权（必须在存储之后！）
+        FHE.allowThis(newBalance);
+        FHE.allow(newBalance, msg.sender);
+
         emit IdentityUpdated(msg.sender, "assetBalance");
     }
 
@@ -163,11 +168,16 @@ contract IdentityProofManager is SepoliaConfig {
         externalEuint32 encryptedNFT,
         bytes calldata inputProof
     ) external onlyRegistered(msg.sender) {
+        // ⭐ Step 1: 转换
         euint32 newNFT = FHE.fromExternal(encryptedNFT, inputProof);
-        FHE.allow(newNFT, msg.sender);
-        FHE.allowThis(newNFT);
 
+        // ⭐ Step 2: 存储（必须先存储！）
         identities[msg.sender].nftCount = newNFT;
+
+        // ⭐ Step 3: 授权（必须在存储之后！）
+        FHE.allowThis(newNFT);
+        FHE.allow(newNFT, msg.sender);
+
         emit IdentityUpdated(msg.sender, "nftCount");
     }
 
@@ -180,11 +190,16 @@ contract IdentityProofManager is SepoliaConfig {
         externalEuint32 encryptedAge,
         bytes calldata inputProof
     ) external onlyRegistered(msg.sender) {
+        // ⭐ Step 1: 转换
         euint32 newAge = FHE.fromExternal(encryptedAge, inputProof);
-        FHE.allow(newAge, msg.sender);
-        FHE.allowThis(newAge);
 
+        // ⭐ Step 2: 存储（必须先存储！）
         identities[msg.sender].accountAge = newAge;
+
+        // ⭐ Step 3: 授权（必须在存储之后！）
+        FHE.allowThis(newAge);
+        FHE.allow(newAge, msg.sender);
+
         emit IdentityUpdated(msg.sender, "accountAge");
     }
 
@@ -197,11 +212,16 @@ contract IdentityProofManager is SepoliaConfig {
         externalEuint32 encryptedTx,
         bytes calldata inputProof
     ) external onlyRegistered(msg.sender) {
+        // ⭐ Step 1: 转换
         euint32 newTx = FHE.fromExternal(encryptedTx, inputProof);
-        FHE.allow(newTx, msg.sender);
-        FHE.allowThis(newTx);
 
+        // ⭐ Step 2: 存储（必须先存储！）
         identities[msg.sender].txCount = newTx;
+
+        // ⭐ Step 3: 授权（必须在存储之后！）
+        FHE.allowThis(newTx);
+        FHE.allow(newTx, msg.sender);
+
         emit IdentityUpdated(msg.sender, "txCount");
     }
 

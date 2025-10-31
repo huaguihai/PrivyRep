@@ -15,25 +15,25 @@ async function main() {
 
   const deploymentsDir = "./deployments";
   const files = fs.readdirSync(deploymentsDir)
-    .filter(f => f.startsWith(`${hre.network.name}-`) && f.endsWith('.json'))
+    .filter(f => f.startsWith(`${hre.network.name}-`) && f.endsWith('.json') && !f.includes('-v2-'))
     .sort()
-    .reverse(); // 最新的在前
+    .reverse(); // 最新的在前，但排除 V2 文件
 
   if (files.length === 0) {
-    throw new Error(`No deployment files found for network: ${hre.network.name}`);
+    throw new Error(`No V1 deployment files found for network: ${hre.network.name}`);
   }
 
-  const latestDeployment = JSON.parse(
+  const v1Deployment = JSON.parse(
     fs.readFileSync(path.join(deploymentsDir, files[0]), 'utf8')
   );
 
-  console.log("  📄 Using deployment file:", files[0]);
-  console.log("  ✅ ReputationScore:      ", latestDeployment.contracts.ReputationScore);
-  console.log("  ✅ IdentityProofManager: ", latestDeployment.contracts.IdentityProofManager);
-  console.log("  ✅ VerificationService (V1):", latestDeployment.contracts.VerificationService, "\n");
+  console.log("  📄 Using V1 deployment file:", files[0]);
+  console.log("  ✅ ReputationScore:      ", v1Deployment.contracts.ReputationScore);
+  console.log("  ✅ IdentityProofManager: ", v1Deployment.contracts.IdentityProofManager);
+  console.log("  ✅ VerificationService (V1):", v1Deployment.contracts.VerificationService, "\n");
 
-  const reputationScoreAddress = latestDeployment.contracts.ReputationScore;
-  const identityProofManagerAddress = latestDeployment.contracts.IdentityProofManager;
+  const reputationScoreAddress = v1Deployment.contracts.ReputationScore;
+  const identityProofManagerAddress = v1Deployment.contracts.IdentityProofManager;
 
   // ============ 2. 部署 VerificationServiceV2 ============
   console.log("📦 Deploying VerificationServiceV2...");
@@ -95,7 +95,7 @@ async function main() {
   console.log("\n📋 Deployment Summary:\n");
   console.log("  ReputationScore (V1):        ", reputationScoreAddress);
   console.log("  IdentityProofManager (V1):   ", identityProofManagerAddress);
-  console.log("  VerificationService (V1):    ", latestDeployment.contracts.VerificationService);
+  console.log("  VerificationService (V1):    ", v1Deployment.contracts.VerificationService);
   console.log("  VerificationServiceV2 (NEW): ", verificationServiceV2Address);
   console.log("\n✅ V2 Features:");
   console.log("  • Automatic Oracle callback mechanism");
@@ -110,7 +110,7 @@ async function main() {
   console.log("\n🔗 To verify V2 on Etherscan, run:");
   console.log(`  npx hardhat verify --network sepolia ${verificationServiceV2Address} ${identityProofManagerAddress} ${reputationScoreAddress}`);
   console.log("\n⚠️  Keep V1 address as backup for rollback:");
-  console.log(`  V1: ${latestDeployment.contracts.VerificationService}`);
+  console.log(`  V1: ${v1Deployment.contracts.VerificationService}`);
   console.log("\n");
 
   // 保存部署地址到文件
@@ -122,7 +122,7 @@ async function main() {
     contracts: {
       ReputationScore: reputationScoreAddress,
       IdentityProofManager: identityProofManagerAddress,
-      VerificationService: latestDeployment.contracts.VerificationService, // V1 (备份)
+      VerificationService: v1Deployment.contracts.VerificationService, // V1 (备份)
       VerificationServiceV2: verificationServiceV2Address // V2 (新)
     },
     notes: "V2 adds Oracle auto-callback. V1 kept as backup for rollback."

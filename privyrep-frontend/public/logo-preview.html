@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrivyRep Logo Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .logo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .logo-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .logo-card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .logo-card p {
+            color: #666;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .logo-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            min-height: 200px;
+        }
+
+        .logo-display img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .background-demo {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .bg-light {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .bg-dark {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .color-palette {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 40px;
+        }
+
+        .color-palette h2 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+            text-align: center;
+        }
+
+        .colors {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .color-item {
+            text-align: center;
+        }
+
+        .color-box {
+            width: 100%;
+            height: 100px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .color-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .color-code {
+            font-size: 0.9rem;
+            color: #666;
+            font-family: 'Courier New', monospace;
+        }
+
+        .design-elements {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .design-elements h2 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+            text-align: center;
+        }
+
+        .elements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .element-item {
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .element-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .element-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .element-desc {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .footer {
+            color: white;
+            text-align: center;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 PrivyRep Logo Design</h1>
+
+        <div class="logo-grid">
+            <!-- Main Logo -->
+            <div class="logo-card">
+                <h2>主 Logo</h2>
+                <p>完整版 Logo (200x200px)</p>
+                <div class="logo-display">
+                    <img src="logo.svg" alt="PrivyRep Logo" width="200">
+                </div>
+                <div class="background-demo">
+                    <div class="bg-light">
+                        <img src="logo.svg" alt="Logo on light background" width="120">
+                    </div>
+                    <div class="bg-dark">
+                        <img src="logo.svg" alt="Logo on dark background" width="120">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Favicon -->
+            <div class="logo-card">
+                <h2>Favicon</h2>
+                <p>浏览器图标 (32x32px)</p>
+                <div class="logo-display">
+                    <img src="favicon.svg" alt="PrivyRep Favicon" width="128">
+                </div>
+                <div class="background-demo">
+                    <div class="bg-light">
+                        <img src="favicon.svg" alt="Favicon on light background" width="64">
+                    </div>
+                    <div class="bg-dark">
+                        <img src="favicon.svg" alt="Favicon on dark background" width="64">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Color Palette -->
+        <div class="color-palette">
+            <h2>🎨 色彩方案</h2>
+            <div class="colors">
+                <div class="color-item">
+                    <div class="color-box" style="background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);"></div>
+                    <div class="color-name">主色调</div>
+                    <div class="color-code">#3B82F6<br>→ #1D4ED8</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-box" style="background: #FFFFFF; border: 1px solid #e0e0e0;"></div>
+                    <div class="color-name">辅助色</div>
+                    <div class="color-code">#FFFFFF</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-box" style="background: #FCD34D;"></div>
+                    <div class="color-name">强调色</div>
+                    <div class="color-code">#FCD34D</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-box" style="background: linear-gradient(180deg, #60A5FA 0%, #3B82F6 100%);"></div>
+                    <div class="color-name">盾牌渐变</div>
+                    <div class="color-code">#60A5FA<br>→ #3B82F6</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Design Elements -->
+        <div class="design-elements">
+            <h2>🎯 设计元素</h2>
+            <div class="elements-grid">
+                <div class="element-item">
+                    <div class="element-icon">🛡️</div>
+                    <div class="element-name">盾牌</div>
+                    <div class="element-desc">隐私保护<br>安全防护</div>
+                </div>
+                <div class="element-item">
+                    <div class="element-icon">🔒</div>
+                    <div class="element-name">锁</div>
+                    <div class="element-desc">FHE 加密<br>数据安全</div>
+                </div>
+                <div class="element-item">
+                    <div class="element-icon">⭐</div>
+                    <div class="element-name">星星</div>
+                    <div class="element-desc">声誉评分<br>信誉等级</div>
+                </div>
+                <div class="element-item">
+                    <div class="element-icon">🔷</div>
+                    <div class="element-name">六边形</div>
+                    <div class="element-desc">区块链<br>去中心化</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 PrivyRep - Privacy-First Identity & Reputation System</p>
+            <p>Built with Zama FHEVM</p>
+        </div>
+    </div>
+</body>
+</html>

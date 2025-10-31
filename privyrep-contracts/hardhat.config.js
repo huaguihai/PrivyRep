@@ -24,6 +24,9 @@ module.exports = {
       url: SEPOLIA_RPC_URL,
       accounts: [PRIVATE_KEY],
       chainId: 11155111,
+      timeout: 120000, // 2 minutes
+      gas: "auto",
+      gasPrice: "auto",
     },
     hardhat: {
       chainId: 31337,
@@ -37,6 +40,10 @@ module.exports = {
     tests: "./test",
     cache: "./cache",
     artifacts: "./artifacts",
+  },
+  // FHEVM 插件配置
+  fhevm: {
+    enabled: true,
   },
 };
 

@@ -1,22 +1,24 @@
-import ReputationScoreABI from '../contracts/ReputationScore.json';
-import IdentityProofManagerABI from '../contracts/IdentityProofManager.json';
-import VerificationServiceV2ABI from '../contracts/VerificationServiceV2.json'; // V2 with Oracle callback
+/**
+ * Smart Contract Configuration
+ *
+ * Supports V1 and V2 implementations:
+ * - V1: Manual completion with oracleService.js (demo mode)
+ * - V2: Automatic Oracle callback (production mode)
+ *
+ * Toggle between versions using VITE_USE_V2 environment variable
+ */
+import { contractsV1 } from './contractsV1';
+import { contractsV2 } from './contractsV2';
 
-export const REPUTATION_SCORE_ADDRESS = import.meta.env.VITE_REPUTATION_SCORE_ADDRESS as `0x${string}`;
-export const IDENTITY_PROOF_MANAGER_ADDRESS = import.meta.env.VITE_IDENTITY_PROOF_MANAGER_ADDRESS as `0x${string}`;
-export const VERIFICATION_SERVICE_ADDRESS = import.meta.env.VITE_VERIFICATION_SERVICE_ADDRESS as `0x${string}`;
+// Version selection based on environment variable
+const USE_V2 = import.meta.env.VITE_USE_V2 === 'true';
 
-export const contracts = {
-  reputationScore: {
-    address: REPUTATION_SCORE_ADDRESS,
-    abi: ReputationScoreABI.abi,
-  },
-  identityProofManager: {
-    address: IDENTITY_PROOF_MANAGER_ADDRESS,
-    abi: IdentityProofManagerABI.abi,
-  },
-  verificationService: {
-    address: VERIFICATION_SERVICE_ADDRESS,
-    abi: VerificationServiceV2ABI.abi, // ✅ Using V2 ABI (supports Oracle callback)
-  },
-} as const;
+// Export the selected configuration
+export const contracts = USE_V2 ? contractsV2 : contractsV1;
+
+// Export version info for debugging
+export const contractVersion = USE_V2 ? 'V2' : 'V1';
+
+// Log current version on load
+console.log(`🔧 Using contract version: ${contractVersion}`);
+console.log(`📍 VerificationService address: ${contracts.verificationService.address}`);

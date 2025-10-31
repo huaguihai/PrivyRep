@@ -1,22 +1,29 @@
+import { useState } from 'react';
 import { useAccount, useReadContract } from 'wagmi';
+import { Award, RefreshCw, CheckCircle, XCircle, AlertCircle, Info, TrendingUp } from 'lucide-react';
 import { contracts } from '../config/contracts';
 
 export function ReputationDisplay() {
   const { address, isConnected } = useAccount();
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Read user's reputation score
-  const { data: score, isLoading, refetch } = useReadContract({
+  // Read user's complete reputation data
+  const { data: reputationData, isLoading, refetch: refetchReputation } = useReadContract({
     address: contracts.reputationScore.address,
     abi: contracts.reputationScore.abi,
-    functionName: 'getScore',
+    functionName: 'getUserReputationData',
     args: address ? [address] : undefined,
     query: {
       enabled: !!address,
     },
   });
 
+  // Extract score from reputation data
+  // getUserReputationData returns: (score, level, lastActivityTime, totalVerifications, totalContributions)
+  const score = reputationData ? reputationData[0] : undefined;
+
   // Read verification count
-  const { data: verificationCount } = useReadContract({
+  const { data: verificationCount, refetch: refetchVerificationCount } = useReadContract({
     address: contracts.verificationService.address,
     abi: contracts.verificationService.abi,
     functionName: 'getUserVerificationCount',
@@ -27,7 +34,7 @@ export function ReputationDisplay() {
   });
 
   // Read registration status
-  const { data: isRegistered } = useReadContract({
+  const { data: isRegistered, refetch: refetchRegistration } = useReadContract({
     address: contracts.identityProofManager.address,
     abi: contracts.identityProofManager.abi,
     functionName: 'hasRegistered',
@@ -37,15 +44,35 @@ export function ReputationDisplay() {
     },
   });
 
+  // Manual refresh handler
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([
+        refetchReputation(),
+        refetchVerificationCount(),
+        refetchRegistration()
+      ]);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   if (!isConnected) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          我的声誉分数
-        </h2>
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+      <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+        <div className="flex items-center space-x-3 mb-4">
+          <div className="bg-amber-100 p-2 rounded-lg">
+            <Award className="w-6 h-6 text-amber-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900">
+            My Reputation Score
+          </h2>
+        </div>
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-start space-x-3">
+          <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
           <p className="text-yellow-800">
-            请先连接钱包以查看您的声誉分数
+            Please connect your wallet to view your reputation score
           </p>
         </div>
       </div>
@@ -53,99 +80,146 @@ export function ReputationDisplay() {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">
-          我的声誉分数
-        </h2>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center space-x-3">
+          <div className="bg-gradient-to-br from-amber-500 to-amber-600 p-2 rounded-lg shadow-md">
+            <Award className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">My Reputation</h2>
+            <p className="text-sm text-gray-600">Track your on-chain reputation score</p>
+          </div>
+        </div>
         <button
-          onClick={() => refetch()}
-          className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+          onClick={handleRefresh}
+          disabled={isLoading || refreshing}
+          className="flex items-center space-x-2 px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          🔄 刷新
+          <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+          <span>{refreshing ? 'Refreshing...' : 'Refresh'}</span>
         </button>
       </div>
 
       {isLoading ? (
-        <div className="text-center py-8">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-          <p className="text-gray-600 mt-2">加载中...</p>
+        <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+          <p className="text-gray-600 mt-4">Loading your reputation...</p>
         </div>
       ) : (
         <div className="space-y-6">
           {/* Reputation Score Card */}
-          <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg p-6 text-white">
-            <p className="text-sm font-medium opacity-90 mb-2">当前声誉分数</p>
-            <div className="flex items-baseline">
-              <span className="text-5xl font-bold">
+          <div className="bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 rounded-xl p-8 text-white shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm font-medium opacity-90">Current Reputation Score</p>
+              <Award className="w-6 h-6 text-amber-200" />
+            </div>
+            <div className="flex items-baseline mb-6">
+              <span className="text-6xl font-bold">
                 {score !== undefined && score !== null ? score.toString() : '0'}
               </span>
-              <span className="text-2xl ml-2 opacity-75">分</span>
+              <span className="text-2xl ml-2 opacity-75">points</span>
             </div>
-            <div className="mt-4 pt-4 border-t border-white/20">
+            <div className="pt-4 border-t border-white/20">
               <p className="text-sm opacity-90">
                 {score !== undefined && Number(score) > 0
-                  ? '您已经建立了初步声誉，继续完成验证以提升分数！'
-                  : '完成身份验证以开始建立您的链上声誉'}
+                  ? 'Great! You\'ve started building your reputation. Complete more verifications to increase your score!'
+                  : 'Complete identity verification to start building your on-chain reputation'}
               </p>
             </div>
           </div>
 
           {/* Statistics Grid */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-sm text-gray-600 mb-1">注册状态</p>
-              <p className="text-2xl font-bold text-gray-900">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-medium text-gray-600">Registration Status</p>
                 {isRegistered ? (
-                  <span className="text-green-600">✅ 已注册</span>
+                  <CheckCircle className="w-5 h-5 text-green-600" />
                 ) : (
-                  <span className="text-gray-400">❌ 未注册</span>
+                  <XCircle className="w-5 h-5 text-gray-400" />
+                )}
+              </div>
+              <p className="text-3xl font-bold">
+                {isRegistered ? (
+                  <span className="text-green-600">Registered</span>
+                ) : (
+                  <span className="text-gray-400">Not Registered</span>
                 )}
               </p>
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-sm text-gray-600 mb-1">验证次数</p>
-              <p className="text-2xl font-bold text-gray-900">
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-medium text-gray-600">Verifications Completed</p>
+                <TrendingUp className="w-5 h-5 text-blue-600" />
+              </div>
+              <p className="text-3xl font-bold text-gray-900">
                 {verificationCount !== undefined && verificationCount !== null ? verificationCount.toString() : '0'}
               </p>
             </div>
           </div>
 
-          {/* Score Levels Info */}
-          <div className="bg-blue-50 rounded-lg p-4">
-            <h3 className="font-semibold text-blue-900 mb-2">声誉等级说明</h3>
-            <div className="space-y-2 text-sm text-blue-800">
+          {/* Reputation Levels Info */}
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
+            <div className="flex items-center space-x-2 mb-4">
+              <Info className="w-5 h-5 text-blue-600" />
+              <h3 className="font-bold text-blue-900">Reputation Levels</h3>
+            </div>
+            <div className="space-y-3">
               <div className="flex items-center">
-                <span className="w-20 font-medium">0-100:</span>
-                <span>初级用户 - 刚开始建立声誉</span>
+                <div className="w-24 flex-shrink-0">
+                  <span className="inline-block bg-gray-200 text-gray-700 text-xs font-bold px-2 py-1 rounded">0-100</span>
+                </div>
+                <span className="text-sm text-blue-800">Beginner - Starting to build reputation</span>
               </div>
               <div className="flex items-center">
-                <span className="w-20 font-medium">100-500:</span>
-                <span>活跃用户 - 有一定声誉基础</span>
+                <div className="w-24 flex-shrink-0">
+                  <span className="inline-block bg-blue-200 text-blue-700 text-xs font-bold px-2 py-1 rounded">100-500</span>
+                </div>
+                <span className="text-sm text-blue-800">Active User - Established reputation</span>
               </div>
               <div className="flex items-center">
-                <span className="w-20 font-medium">500+:</span>
-                <span>高级用户 - 声誉良好，受信任</span>
+                <div className="w-24 flex-shrink-0">
+                  <span className="inline-block bg-amber-200 text-amber-700 text-xs font-bold px-2 py-1 rounded">500+</span>
+                </div>
+                <span className="text-sm text-blue-800">Trusted User - High reputation, well trusted</span>
               </div>
             </div>
           </div>
 
           {/* Tips */}
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <h3 className="font-semibold text-green-900 mb-2">💡 提升声誉小贴士</h3>
-            <ul className="text-sm text-green-800 space-y-1">
-              <li>✅ 完成身份注册 (+10分基础分数)</li>
-              <li>✅ 通过身份验证 (+根据验证条件获得额外分数)</li>
-              <li>✅ 保持良好的链上行为记录</li>
-              <li>✅ 定期更新您的身份信息</li>
+          <div className="bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-6">
+            <div className="flex items-center space-x-2 mb-4">
+              <TrendingUp className="w-5 h-5 text-emerald-600" />
+              <h3 className="font-bold text-emerald-900">How to Improve Your Reputation</h3>
+            </div>
+            <ul className="space-y-2">
+              <li className="flex items-start text-sm text-emerald-800">
+                <CheckCircle className="w-4 h-4 mr-2 mt-0.5 text-emerald-600 flex-shrink-0" />
+                <span>Complete identity registration (+10 base points)</span>
+              </li>
+              <li className="flex items-start text-sm text-emerald-800">
+                <CheckCircle className="w-4 h-4 mr-2 mt-0.5 text-emerald-600 flex-shrink-0" />
+                <span>Pass identity verification (earn additional points based on criteria)</span>
+              </li>
+              <li className="flex items-start text-sm text-emerald-800">
+                <CheckCircle className="w-4 h-4 mr-2 mt-0.5 text-emerald-600 flex-shrink-0" />
+                <span>Maintain good on-chain behavior records</span>
+              </li>
+              <li className="flex items-start text-sm text-emerald-800">
+                <CheckCircle className="w-4 h-4 mr-2 mt-0.5 text-emerald-600 flex-shrink-0" />
+                <span>Regularly update your identity information</span>
+              </li>
             </ul>
           </div>
 
           {/* Privacy Notice */}
-          <div className="border-t pt-4">
-            <p className="text-xs text-gray-500 text-center">
-              您的声誉分数是公开的，但您的身份数据始终保持加密状态
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+            <p className="text-sm text-blue-800 text-center flex items-center justify-center">
+              <Info className="w-4 h-4 mr-2" />
+              Your reputation score is public, but your identity data remains encrypted at all times
             </p>
           </div>
         </div>
