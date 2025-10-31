@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAccount, useWriteContract, useWaitForTransactionReceipt, useReadContract } from 'wagmi';
+import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { contracts } from '../config/contracts';
 import toast from 'react-hot-toast';
 
@@ -8,13 +8,6 @@ interface VerificationCriteria {
   minNFTCount: number;
   minAccountAge: number;
   minTxCount: number;
-}
-
-interface VerificationTask {
-  taskId: bigint;
-  isCompleted: boolean;
-  passed: boolean;
-  timestamp: bigint;
 }
 
 // SVG Icons
@@ -51,7 +44,7 @@ const InfoIcon = ({ className }: { className?: string }) => (
 export function VerificationRequest() {
   const { address, isConnected } = useAccount();
   const { writeContract, data: hash, isPending, error, reset } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
+  useWaitForTransactionReceipt({ hash });
 
   const [criteria, setCriteria] = useState<VerificationCriteria>({
     minAssetBalance: 100,
@@ -61,18 +54,6 @@ export function VerificationRequest() {
   });
 
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-
-  // Read verification count to track completed verifications
-  const { data: verificationCount } = useReadContract({
-    address: contracts.verificationService.address,
-    abi: contracts.verificationService.abi,
-    functionName: 'getUserVerificationCount',
-    args: address ? [address] : undefined,
-    query: {
-      enabled: !!address,
-      refetchInterval: 10000, // Refresh every 10 seconds
-    },
-  });
 
   // Note: VerificationRequested events are for monitoring only
   // The Oracle will automatically process verification requests

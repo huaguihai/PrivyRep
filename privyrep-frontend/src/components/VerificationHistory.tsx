@@ -192,7 +192,7 @@ export function VerificationHistory() {
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Verification History</h2>
             <p className="text-sm text-gray-600">
-              {verificationCount !== undefined
+              {verificationCount !== undefined && verificationCount !== null
                 ? `Total completed: ${verificationCount.toString()}`
                 : 'Loading...'
               }

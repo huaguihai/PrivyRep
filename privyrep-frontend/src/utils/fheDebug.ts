@@ -92,6 +92,7 @@ export async function diagnoseFheIssue() {
     console.log('\n6️⃣ 检查 FHE SDK...');
     try {
       console.log('正在加载 FHE SDK from CDN...');
+      // @ts-ignore - Dynamic CDN import
       const sdk: any = await import('https://cdn.zama.ai/relayer-sdk-js/0.2.0/relayer-sdk-js.js');
 
       if (!sdk.initSDK || !sdk.createInstance) {
@@ -129,6 +130,7 @@ export async function diagnoseFheIssue() {
     // 7️⃣ 尝试创建测试加密输入
     console.log('\n7️⃣ 测试加密功能...');
     try {
+      // @ts-ignore - Dynamic CDN import
       const sdk: any = await import('https://cdn.zama.ai/relayer-sdk-js/0.2.0/relayer-sdk-js.js');
       await sdk.initSDK();
       const config = {

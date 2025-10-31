@@ -20,7 +20,7 @@ export function ReputationDisplay() {
 
   // Extract score from reputation data
   // getUserReputationData returns: (score, level, lastActivityTime, totalVerifications, totalContributions)
-  const score = reputationData ? reputationData[0] : undefined;
+  const score = reputationData ? (reputationData as readonly [bigint, bigint, bigint, bigint, bigint])[0] : undefined;
 
   // Read verification count
   const { data: verificationCount, refetch: refetchVerificationCount } = useReadContract({

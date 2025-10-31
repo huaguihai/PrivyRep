@@ -28,6 +28,7 @@ export async function initializeFheInstance(): Promise<FhevmInstance> {
   }
 
   // Load SDK from CDN (0.2.0)
+  // @ts-ignore - Dynamic CDN import
   const sdk: any = await import('https://cdn.zama.ai/relayer-sdk-js/0.2.0/relayer-sdk-js.js');
 
   const { initSDK, createInstance, SepoliaConfig } = sdk as any;
@@ -40,7 +41,7 @@ export async function initializeFheInstance(): Promise<FhevmInstance> {
   try {
     fheInstance = await createInstance(config);
     console.log('✅ [FHE] FHEVM instance created successfully!');
-    return fheInstance;
+    return fheInstance as FhevmInstance;
   } catch (err) {
     console.error('❌ [FHE] FHEVM instance creation failed:', err);
     throw err;

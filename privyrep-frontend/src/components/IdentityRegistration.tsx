@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { UserPlus, Lock, Shield, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { UserPlus, Shield, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { encryptIdentityData, type IdentityData } from '../services/fheService';
 import { contracts } from '../config/contracts';
 import toast from 'react-hot-toast';
