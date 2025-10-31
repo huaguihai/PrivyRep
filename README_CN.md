@@ -32,8 +32,8 @@
 
 > **注意**: Zama Relayer 的状态可能会影响 V2 功能。使用前请检查状态。
 
-- **在线 Demo**: [即将推出 - 将部署到 Vercel]
-- **视频演示**: [即将推出 - 将上传到 YouTube]
+- **在线 Demo**: [https://privy-rep.vercel.app/app](https://privy-rep.vercel.app/app)
+- **视频演示**: [https://youtu.be/tNJ8hoOx2N4](https://youtu.be/tNJ8hoOx2N4)
 - **网络**: Sepolia 测试网
 
 ---

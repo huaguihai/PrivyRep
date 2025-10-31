@@ -34,8 +34,8 @@
 
 > **Note**: Zama Relayer status may affect V2 functionality. Check status before use.
 
-- **Live Demo**: [Coming Soon - Will be deployed to Vercel]
-- **Video Demo**: [Coming Soon - Will be uploaded to YouTube]
+- **Live Demo**: [https://privy-rep.vercel.app/app](https://privy-rep.vercel.app/app)
+- **Video Demo**: [https://youtu.be/tNJ8hoOx2N4](https://youtu.be/tNJ8hoOx2N4)
 - **Network**: Sepolia Testnet
 
 ---
